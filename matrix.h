@@ -10,7 +10,7 @@
 // TODO(#3): Determinant function
 // TODO(#4): Move semantic
 // TODO(#5): Transpose method
-// TODO: Identity matrix method
+// TODO(#6): Identity matrix method
 // TODO: Invertible matrix function
 // TODO: Rewrite assignment operator
 
