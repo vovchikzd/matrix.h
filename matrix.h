@@ -8,7 +8,7 @@
 // TODO(#1): Iterators
 // TODO(#2): Multiplication
 // TODO(#3): Determinant function
-// TODO: Move semantic
+// TODO(#4): Move semantic
 // TODO: Transpose method
 // TODO: Identity matrix method
 // TODO: Invertible matrix function
