@@ -6,7 +6,7 @@
 #include <initializer_list>
 
 // TODO(#1): Iterators
-// TODO: Multiplication
+// TODO(#2): Multiplication
 // TODO: Determinant function
 // TODO: Move semantic
 // TODO: Transpose method
