@@ -5,9 +5,14 @@
 #include <exception>
 #include <initializer_list>
 
-// TODO: Implement iterators
-// TODO: Implement multiplication
-// TODO: Implement determinant function
+// TODO(#1): Iterators
+// TODO: Multiplication
+// TODO: Determinant function
+// TODO: Move semantic
+// TODO: Transpose method
+// TODO: Identity matrix method
+// TODO: Invertible matrix function
+// TODO: Rewrite assignment operator
 
 template <typename T, size_t Rows, size_t Columns,
          template <typename> class Allocator = std::allocator>
@@ -241,8 +246,8 @@ Matrix<T, Rows, Columns, Allocator> operator-(const Matrix<T, Rows, Columns, All
     return copy;
 }
 
-template <typename T, size_t Rows>
-T determinant(Matrix<T, Rows, Rows>& matrix) {
+template <typename T, size_t Size, template <typename> class Allocator>
+T determinant(Matrix<T, Size, Size, Allocator>& matrix) {
     // implement
 }
 
