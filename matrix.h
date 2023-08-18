@@ -11,7 +11,7 @@
 // TODO(#4): Move semantic
 // TODO(#5): Transpose method
 // TODO(#6): Identity matrix method
-// TODO: Invertible matrix function
+// TODO(#7): Invertible matrix function
 // TODO: Rewrite assignment operator
 
 template <typename T, size_t Rows, size_t Columns,
