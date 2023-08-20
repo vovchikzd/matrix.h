@@ -39,7 +39,7 @@ public:
         }
     }
 
-    Matrix(std::initializer_list<T> list) {
+    Matrix(std::initializer_list<T> list): Matrix() {
         for(auto it = list.begin(), end = list.end(); it != end; ++it) {
             push_back(*it);
         }
@@ -96,21 +96,23 @@ public:
     size_t capacity() const {
         return cap;
     }
+    
 
     Matrix<T, Rows, Columns, Allocator>& operator=(const Matrix<T, Rows, Columns, Allocator>& matrix) {
-        for (; sz > matrix.size(); --sz) {
-            size_t first_index = sz / Columns;
-            size_t second_index = sz - (first_index * Columns);
-            type_alloc_traits::destroy(type_alloc,
-                    rows_ptrs[first_index] + second_index);
-        }
-
-        for (size_t i = 0; i < sz; ++i) {
-            (*this)[i] = matrix[i];
+        if (this != &matrix) {
+            for (; sz > matrix.size(); --sz) {
+                size_t first_index = sz / Columns;
+                size_t second_index = sz - (first_index * Columns);
+                type_alloc_traits::destroy(type_alloc,
+                        rows_ptrs[first_index] + second_index);
+            }
+            
+            for (size_t i = 0; i < sz; ++i) {
+                (*this)[i] = matrix[i];
+            }
         }
 
         return *this;
-        
     }
 
     Matrix<T, Rows, Columns, Allocator>& operator+=(const Matrix<T, Rows, Columns, Allocator>& matrix) {
@@ -184,17 +186,17 @@ public:
     }
 
     ~Matrix() {
-        for (; sz > 0; --sz) {
-            size_t first_index = sz / Columns;
-            size_t second_index = sz - (first_index * Columns);
+        for (size_t place = 0; place < sz; ++place) {
+            size_t first_index = place / Columns;
+            size_t second_index = place - (first_index * Columns);
             type_alloc_traits::destroy(type_alloc,
                     rows_ptrs[first_index] + second_index);
         }
-
+        
         for (size_t i = 0; i < Rows; ++i) {
             type_alloc_traits::deallocate(type_alloc, rows_ptrs[i], Columns);
         }
-
+        
         ptr_alloc_traits::deallocate(ptr_alloc, rows_ptrs, Rows);
     }
 };
