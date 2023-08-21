@@ -6,14 +6,12 @@
 #include <initializer_list>
 
 // TODO(#1): Iterators
-// TODO(#2): Multiplication
 // TODO(#3): Determinant function
 // TODO(#4): Move semantic
 // TODO(#5): Transpose method
 // TODO(#6): Identity matrix method
 // TODO(#7): Invertible matrix function
-// TODO(#8): Rewrite assignment operator
-// TODO(#9): Unary operators
+// TODO: Rewrite memory management
 
 template <typename T, size_t Rows, size_t Columns,
          template <typename> class Allocator = std::allocator>
@@ -96,22 +94,38 @@ public:
     size_t capacity() const {
         return cap;
     }
-    
+
+    size_t rows() const {
+        return Rows;
+    }
+
+    size_t columns() const {
+        return Columns;
+    }
 
     Matrix<T, Rows, Columns, Allocator>& operator=(const Matrix<T, Rows, Columns, Allocator>& matrix) {
         if (this != &matrix) {
-            for (; sz > matrix.size(); --sz) {
-                size_t first_index = sz / Columns;
-                size_t second_index = sz - (first_index * Columns);
-                type_alloc_traits::destroy(type_alloc,
-                        rows_ptrs[first_index] + second_index);
-            }
-            
-            for (size_t i = 0; i < sz; ++i) {
-                (*this)[i] = matrix[i];
+            if (sz > matrix.size()) {
+                for (size_t place = sz; sz < matrix.size(); ++place) {
+                    size_t first_index = place / Columns;
+                    size_t second_index = place - (first_index * Columns);
+                    type_alloc_traits::destroy(type_alloc,
+                            rows_ptrs[first_index] + second_index);
+                }
+                sz = matrix.size();
+                for (size_t place = 0; place < sz; ++place) {
+                    (*this)[place] = matrix[place];
+                }
+            } else {
+                for (size_t place = 0; place < sz; ++place) {
+                    (*this)[place] = matrix[place];
+                }
+
+                for (size_t place = sz; place < matrix.size(); ++place) {
+                    push_back(matrix[place]);
+                }
             }
         }
-
         return *this;
     }
 
@@ -133,11 +147,6 @@ public:
         for (size_t i = 0; i < sz; ++i) {
             (*this)[i] *= value;
         }
-        return *this;
-    }
-
-    Matrix<T, Rows, Columns, Allocator>& operator*=(const Matrix<T, Rows, Columns, Allocator>& matrix) {
-        // implement
         return *this;
     }
 
@@ -228,9 +237,17 @@ Matrix<T, Rows, Columns, Allocator> operator*(const T& value,
 template <typename T, size_t Rows, size_t K, size_t Columns, template <typename> class Allocator>
 Matrix<T, Rows, Columns, Allocator> operator*(const Matrix<T, Rows, K, Allocator>& left,
         const Matrix<T, K, Columns, Allocator>& right) {
-    auto copy = left;
-    copy *= right;
-    return copy;
+    Matrix<T, Rows, Columns, Allocator> result;
+    for (size_t row = 0; row < Rows; ++row) {
+        for (size_t column = 0; column < Columns; ++column) {
+            T sum = 0;
+            for (size_t k = 0; k < K; ++k) {
+                sum += left(row, k) * right(k, column);
+            }
+            result.push_back(sum);
+        }
+    }
+    return result;
 }
 
 template <typename T, size_t Rows, size_t Columns, template <typename> class Allocator>
@@ -246,6 +263,18 @@ Matrix<T, Rows, Columns, Allocator> operator-(const Matrix<T, Rows, Columns, All
         const Matrix<T, Rows, Columns, Allocator>& right) {
     auto copy = left;
     copy -= right;
+    return copy;
+}
+
+template <typename T, size_t Rows, size_t Columns, template <typename> class Allocator>
+Matrix<T, Rows, Columns, Allocator> operator+(Matrix<T, Rows, Columns, Allocator>& matrix) {
+    return matrix;
+}
+
+template <typename T, size_t Rows, size_t Columns, template <typename> class Allocator>
+Matrix<T, Rows, Columns, Allocator> operator-(Matrix<T, Rows, Columns, Allocator>& matrix) {
+    auto copy = matrix;
+    copy *= -1;
     return copy;
 }
 
