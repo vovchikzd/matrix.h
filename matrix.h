@@ -11,7 +11,6 @@
 // TODO(#5): Transpose method
 // TODO(#6): Identity matrix method
 // TODO(#7): Invertible matrix function
-// TODO(#10): Rewrite memory management DONE
 
 template <typename T, size_t Rows, size_t Columns,
          template <typename> class Allocator = std::allocator>
