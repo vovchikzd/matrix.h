@@ -2,12 +2,12 @@
 #define MATRIX_H
 
 #include <memory>
-#include <exception>
+#include <utility>
+#include <stdexcept>
 #include <initializer_list>
 
 // TODO(#1): Iterators
 // TODO(#3): Determinant function
-// TODO(#4): Move semantic
 // TODO(#5): Transpose method
 // TODO(#6): Identity matrix method
 // TODO(#7): Invertible matrix function
@@ -24,11 +24,14 @@ private:
 
     using alloc_traits = std::allocator_traits<Allocator<T>>;
 
+    void swap(Matrix<T, Rows, Columns, Allocator>& matrix) {
+        std::swap(sz, matrix.sz);
+        std::swap(values, matrix.values);
+    }
+
 public:
 
-    Matrix(): values(alloc_traits::allocate(alloc, cap)) {
-
-    }
+    Matrix(): values(alloc_traits::allocate(alloc, cap)) {}
 
     Matrix(std::initializer_list<T> list): Matrix() {
         for(auto it = list.begin(), end = list.end(); it != end; ++it) {
@@ -53,6 +56,13 @@ public:
         for (size_t i = 0; i < matrix.size(); ++i) {
             push_back(matrix[i]);
         }
+    }
+
+    Matrix(Matrix<T, Rows, Columns, Allocator>&& matrix): Matrix() {
+        sz = matrix.sz;
+        values = matrix.values;
+        matrix.sz = 0;
+        matrix.values = nullptr;
     }
 
     void push_back(const T& value) {
@@ -95,23 +105,18 @@ public:
 
     Matrix<T, Rows, Columns, Allocator>& operator=(const Matrix<T, Rows, Columns, Allocator>& matrix) {
         if (this != &matrix) {
-            if (sz > matrix.size()) {
-                for (size_t place = matrix.size(); place < sz; ++place) {
-                    alloc_traits::destroy(alloc, values + place);
-                }
-                sz = matrix.size();
-                for (size_t place = 0; place < sz; ++place) {
-                    values[place] = matrix[place];
-                }
-            } else {
-                for (size_t place = 0; place < sz; ++place) {
-                    values[place] = matrix[place];
-                }
+            auto copy = matrix;
+            swap(copy);
+        }
+        return *this;
+    }
 
-                for (size_t place = sz; place < matrix.size(); ++place) {
-                    push_back(matrix[place]);
-                }
-            }
+    Matrix<T, Rows, Columns, Allocator>& operator=(Matrix<T, Rows, Columns, Allocator>&& matrix) {
+        if (this != &matrix) {
+            sz = matrix.sz;
+            values = matrix.values;
+            matrix.sz = 0;
+            matrix.values = nullptr;
         }
         return *this;
     }
