@@ -58,9 +58,9 @@ public:
         }
     }
 
-    Matrix(Matrix<T, Rows, Columns, Allocator>&& matrix): Matrix() {
-        sz = matrix.sz;
-        values = matrix.values;
+    Matrix(Matrix<T, Rows, Columns, Allocator>&& matrix):
+        sz(matrix.sz),
+        values(matrix.values) {
         matrix.sz = 0;
         matrix.values = nullptr;
     }
@@ -113,6 +113,11 @@ public:
 
     Matrix<T, Rows, Columns, Allocator>& operator=(Matrix<T, Rows, Columns, Allocator>&& matrix) {
         if (this != &matrix) {
+            for (size_t i = 0; i < sz; ++i) {
+                alloc_traits::destroy(alloc, values + i);
+            }
+            alloc_traits::deallocate(alloc, values, cap);
+
             sz = matrix.sz;
             values = matrix.values;
             matrix.sz = 0;
