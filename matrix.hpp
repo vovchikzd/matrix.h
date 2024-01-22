@@ -1,112 +1,54 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef MATRIX_H_
+#define MATRIX_H_
 
 #include <initializer_list>
-#include <memory>
-#include <stdexcept>
-#include <utility>
+#include <vector>
+// #include <utility>
 
-// TODO(#1): Iterators
 // TODO(#3): Determinant function
 // TODO(#5): Transpose method
 // TODO(#6): Identity matrix method
 // TODO(#7): Invertible matrix function
 
 template <typename T, size_t Rows, size_t Columns,
-          template <typename> class Allocator = std::allocator>
-class Matrix {
+          typename Container = std::vector<T>>
+class Matrix final {
  private:
-  const size_t cap = Rows * Columns;
-  size_t sz = 0;
-  Allocator<T> alloc;
-  T *values = nullptr;
-
-  using alloc_traits = std::allocator_traits<Allocator<T>>;
-
-  void swap(Matrix<T, Rows, Columns, Allocator> &matrix) {
-    std::swap(sz, matrix.sz);
-    std::swap(values, matrix.values);
-  }
+  const size_t cap_ = Rows * Columns;
+  size_t sz_ = cap_;
+  Container container_;
 
  public:
-  Matrix() : values(alloc_traits::allocate(alloc, cap)) {}
+  Matrix(): container_(cap) {}
 
-  Matrix(std::initializer_list<T> list) : Matrix() {
-    for (auto it = list.begin(), end = list.end(); it != end; ++it) {
-      push_back(*it);
-    }
+  Matrix(std::initializer_list<T> ilist) {
+    container_.reserve(cap_)
+    container_.assign(ilist);
   }
 
-  Matrix(const T *begin, const T *end) : Matrix() {
-    for (; begin != end; ++begin) {
-      push_back(*begin);
-    }
-  }
-
-  template <typename Iter>
-  Matrix(Iter begin, Iter end) : Matrix() {
-    for (; begin != end; ++begin) {
-      push_back(*begin);
-    }
-  }
-
-  Matrix(const Matrix<T, Rows, Columns, Allocator> &matrix) : Matrix() {
-    for (size_t i = 0; i < matrix.size(); ++i) {
-      push_back(matrix[i]);
-    }
-  }
-
-  Matrix(Matrix<T, Rows, Columns, Allocator> &&matrix)
-      : sz(matrix.sz), values(matrix.values) {
-    matrix.sz = 0;
-    matrix.values = nullptr;
-  }
-
-  void push_back(const T &value) {
-    alloc_traits::construct(alloc, values + sz, std::forward(value));
-    ++sz;
-  }
-
-  void push_back(const T *begin, const T *end) {
-    for (; begin != end; ++begin) {
-      push_back(*begin);
-    }
+  Matrix(T *begin,T *end) {
+    container_.reserve(cap_);
+    container_.assign(begin, end);
   }
 
   template <typename Iter>
-  void push_back(Iter begin, Iter end) {
-    for (; begin != end; ++begin) {
-      push_back(*begin);
-    }
+  Matrix(Iter begin, Iter end) {
+    container_.reserve(cap_);
+    container_.assign(begin, end);
+  }
+
+  Matrix(const Container& other_container) {
+    container_.reserve(cap);
+    container_ = other_container;
   }
 
   size_t size() const { return sz; }
-
-  bool empty() const { return sz == 0; }
 
   size_t capacity() const { return cap; }
 
   size_t rows() const { return Rows; }
 
   size_t columns() const { return Columns; }
-
-  Matrix<T, Rows, Columns, Allocator> &operator=(
-      const Matrix<T, Rows, Columns, Allocator> &matrix) {
-    if (this != &matrix) {
-      auto copy = matrix;
-      swap(copy);
-    }
-    return *this;
-  }
-
-  Matrix<T, Rows, Columns, Allocator> &operator=(
-      Matrix<T, Rows, Columns, Allocator> &&matrix) {
-    if (this != &matrix) {
-      auto moved = std::move(matrix);
-      swap(moved);
-    }
-    return *this;
-  }
 
   Matrix<T, Rows, Columns, Allocator> &operator+=(
       const Matrix<T, Rows, Columns, Allocator> &matrix) {
