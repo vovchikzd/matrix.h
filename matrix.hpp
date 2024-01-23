@@ -3,6 +3,8 @@
 
 #include <initializer_list>
 #include <vector>
+#include <iterator>
+#include <stdexcept>
 // #include <utility>
 
 // TODO(#3): Determinant function
@@ -15,104 +17,86 @@ template <typename T, size_t Rows, size_t Columns,
 class Matrix final {
  private:
   const size_t cap_ = Rows * Columns;
-  size_t sz_ = cap_;
+  size_t sz_ = 0;
   Container container_;
 
  public:
-  Matrix(): container_(cap) {}
+  Matrix() = default;
 
-  Matrix(std::initializer_list<T> ilist) {
-    container_.reserve(cap_)
-    container_.assign(ilist);
+  Matrix(std::initializer_list<T> ilist): container_(ilist) {
+    auto size = container_.size();
+    sz_ = size >= cap_ ? cap_ : size;
   }
 
-  Matrix(T *begin,T *end) {
-    container_.reserve(cap_);
-    container_.assign(begin, end);
+  Matrix(T *begin, T *end): container_(begin, end) {
+    auto size = container_.size();
+    sz_ = size >= cap_ ? cap_ : size;
   }
 
-  template <typename Iter>
-  Matrix(Iter begin, Iter end) {
-    container_.reserve(cap_);
-    container_.assign(begin, end);
+  template <typename InputIt>
+  Matrix(InputIt begin, InputIt end): container_(begin, end) {
+    auto size = container_.size();
+    sz_ = size >= cap_ ? cap_ : size;
   }
 
-  Matrix(const Container& other_container) {
-    container_.reserve(cap);
-    container_ = other_container;
+  Matrix(const Container &other_container): container_(other_container) {
+    auto size = container_.size();
+    sz_ = size >= cap_ ? cap_ : size;
   }
 
-  size_t size() const { return sz; }
+  size_t size() const { return sz_; }
 
-  size_t capacity() const { return cap; }
+  size_t capacity() const { return cap_; }
 
   size_t rows() const { return Rows; }
 
   size_t columns() const { return Columns; }
 
-  Matrix<T, Rows, Columns, Allocator> &operator+=(
-      const Matrix<T, Rows, Columns, Allocator> &matrix) {
-    for (size_t i = 0; i < sz; ++i) {
-      values[i] += matrix[i];
+  Matrix<T, Rows, Columns, Container> &operator+=(
+      const Matrix<T, Rows, Columns, Container> &matrix) {
+    for (size_t ind = 0; ind < sz_; ++ind) {
+      container_[ind] += matrix.container_[ind];
     }
     return *this;
   }
 
-  Matrix<T, Rows, Columns, Allocator> &operator-=(
-      const Matrix<T, Rows, Columns, Allocator> &matrix) {
-    for (size_t i = 0; i < sz; ++i) {
-      values[i] -= matrix[i];
+  Matrix<T, Rows, Columns, Container> &operator-=(
+      const Matrix<T, Rows, Columns, Container> &matrix) {
+    for (size_t ind = 0; ind < sz_; ++ind) {
+      container_[ind] -= matrix.container_[ind];
     }
     return *this;
   }
 
-  Matrix<T, Rows, Columns, Allocator> &operator*=(const T &value) {
-    for (size_t i = 0; i < sz; ++i) {
-      values[i] *= value;
+  Matrix<T, Rows, Columns, Container> &operator*=(const T &value) {
+    for (auto& val: container_) {
+      val *= value;
     }
     return *this;
   }
 
-  T &operator[](size_t number) { return values[number]; }
-
-  const T &operator[](size_t number) const { return values[number]; }
-
-  T &operator()(size_t first, size_t second) {
-    return values[second + (first * Columns)];
+  T &operator()(size_t row, size_t column) {
+    return container_[column + (row * Columns)];
   }
 
-  const T &operator()(size_t first, size_t second) const {
-    return values[second + (first * Columns)];
+  const T &operator()(size_t row, size_t column) const {
+    return container_[column + (row * Columns)];
   }
 
-  T &at(size_t number) {
-    if (number >= sz) throw std::out_of_range("Invalid index");
-    return values[number];
-  }
-
-  const T &at(size_t number) const {
-    if (number >= sz) throw std::out_of_range("Invalid index");
-    return values[number];
-  }
-
-  T &at(size_t first, size_t second) {
-    if (first >= Rows || second >= Columns)
+  T &at(size_t row, size_t column) {
+    if (row >= Rows || column >= Columns) {
       throw std::out_of_range("Invalid index");
-    return values[second + (first * Columns)];
-  }
-
-  const T &at(size_t first, size_t second) const {
-    if (first >= Rows || second >= Columns)
-      throw std::out_of_range("Invalid index");
-    return values[second + (first * Columns)];
-  }
-
-  ~Matrix() {
-    for (size_t place = 0; place < sz; ++place) {
-      alloc_traits::destroy(alloc, values + place);
     }
-    alloc_traits::deallocate(alloc, values, cap);
+    return values[column + (row * Columns)];
   }
+
+  const T &at(size_t row, size_t column) const {
+    if (row >= Rows || column >= Columns) {
+      throw std::out_of_range("Invalid index");
+    }
+    return values[column + (row * Columns)];
+  }
+
 };
 
 template <typename T, size_t Rows, size_t Columns,
@@ -203,4 +187,7 @@ T determinant(Matrix<T, Size, Size, Allocator>& matrix) {
     // implement
 }
 */
+
+emun class MatrixType {};
+
 #endif
