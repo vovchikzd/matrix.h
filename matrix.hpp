@@ -23,6 +23,8 @@ class Matrix final {
  public:
   Matrix() = default;
 
+  Matrix(const T& value): sz_(cap_), container_(cap_, value) {}
+
   Matrix(std::initializer_list<T> ilist): container_(ilist) {
     auto size = container_.size();
     sz_ = size >= cap_ ? cap_ : size;
