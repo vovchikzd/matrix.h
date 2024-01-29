@@ -3,9 +3,7 @@
 
 #include <initializer_list>
 #include <vector>
-// #include <iterator>
 #include <stdexcept>
-// #include <utility>
 
 // TODO(#5): Transpose method
 // TODO(#6): Identity matrix method
@@ -19,17 +17,17 @@ class Matrix final {
   size_t sz_ = 0;
 
   template <bool>
-  T determinant_impl() = delete;
+  T determinant() = delete;
 
   template <>
-  T determinant_impl<true>() {
+  T determinant<true>() {
     // TODO(#3): Determinant function
   }
 
  public:
   Matrix() = default;
 
-  explicit Matrix(const T &value) : container_(cap_, value), sz_(cap_) {}
+  Matrix(const T &value) : container_(cap_, value), sz_(cap_) {}
 
   Matrix(std::initializer_list<T> ilist)
       : container_(ilist),
@@ -44,8 +42,8 @@ class Matrix final {
       : container_(begin, end),
         sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
-  Matrix(const std::vector<T> &other_container)
-      : container_(other_container),
+  Matrix(const std::vector<T> &other)
+      : container_(other),
         sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   size_t size() const { return sz_; }
@@ -56,7 +54,7 @@ class Matrix final {
 
   size_t columns() const { return Columns; }
 
-  T determinant() const { return determinant_imp<Rows == Columns>(); }
+  T det() const { return determinant<Rows == Columns>(); }
 
   T &operator()(size_t row, size_t column) {
     return container_[column + (row * Columns)];
