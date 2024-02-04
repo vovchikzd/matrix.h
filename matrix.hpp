@@ -3,8 +3,8 @@
 
 #include <initializer_list>
 #include <stdexcept>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 template <size_t Rows, size_t Columns, typename T>
 class Matrix final {
@@ -16,41 +16,27 @@ class Matrix final {
   using iterator = typename std::vector<T>::iterator;
   using const_iterator = typename std::vector<T>::const_iterator;
 
-  // REWRITE
-  template <bool>
-  void resize_() {
-    size_t size = container_.size();
-    if (size >= cap_) {sz_ = cap_; container_.resize(cap_); }
-    else { sz_ = size; }
-  }
-
-  template <>
-  void resize_<true>() {
-    sz_ = cap_;
-    container_.resize(cap_);
-  }
-
  public:
   Matrix() = default;
 
-  Matrix(const T &value) : sz_(cap_), container_(cap_, value) {}
+  Matrix(const T &value) : container_(cap_, value), sz_(cap_) {}
 
-  Matrix(std::initializer_list<T> ilist) : container_(ilist) {
-    resize_<std::is_default_constructible_v<T>>();
-  }
+  Matrix(std::initializer_list<T> ilist)
+      : container_(ilist),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
-  Matrix(T *begin, T *end) : container_(begin, end) {
-    resize_<std::is_default_constructible_v<T>>();
-  }
+  Matrix(T *begin, T *end)
+      : container_(begin, end),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   template <typename InputIt>
-  Matrix(InputIt begin, InputIt end) : container_(begin, end) {
-    resize_<std::is_default_constructible_v<T>>();
-  }
+  Matrix(InputIt begin, InputIt end)
+      : container_(begin, end),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
-  Matrix(const std::vector<T> &container) : container_(container) {
-    resize_<std::is_default_constructible_v<T>>();
-  }
+  Matrix(const std::vector<T> &container)
+      : container_(container),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   size_t size() const { return sz_; }
 
@@ -66,6 +52,7 @@ class Matrix final {
 
   const_iterator cbegin() const { return container_.cbegin(); }
 
+  // rewrite ends
   iterator end() { return container_.end(); }
 
   const_iterator end() const { return container_.cend(); }
@@ -112,7 +99,7 @@ class Matrix final {
 
   template <typename U>
   Matrix<Rows, Columns, T> &operator*=(const U &value) {
-    for (auto&& val : container_) {
+    for (auto &&val : container_) {
       val *= value;
     }
     return *this;
