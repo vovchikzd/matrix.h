@@ -2,49 +2,55 @@
 #define WRAPPER_MATRIX_H_
 
 #include <initializer_list>
-#include <vector>
 #include <stdexcept>
-
-// TODO(#5): Transpose method
-// TODO(#6): Identity matrix method
-// TODO(#7): Invertible matrix function
+#include <vector>
+#include <type_traits>
 
 template <size_t Rows, size_t Columns, typename T>
 class Matrix final {
  private:
-  const size_t cap_ = Rows * Columns;
-  std::vector<T> container_;
+  size_t cap_ = Rows * Columns;
   size_t sz_ = 0;
+  std::vector<T> container_;
 
+  using iterator = typename std::vector<T>::iterator;
+  using const_iterator = typename std::vector<T>::const_iterator;
+
+  // REWRITE
   template <bool>
-  T determinant() = delete;
+  void resize_() {
+    size_t size = container_.size();
+    if (size >= cap_) {sz_ = cap_; container_.resize(cap_); }
+    else { sz_ = size; }
+  }
 
   template <>
-  T determinant<true>() {
-    // TODO(#3): Determinant function
+  void resize_<true>() {
+    sz_ = cap_;
+    container_.resize(cap_);
   }
 
  public:
   Matrix() = default;
 
-  Matrix(const T &value) : container_(cap_, value), sz_(cap_) {}
+  Matrix(const T &value) : sz_(cap_), container_(cap_, value) {}
 
-  Matrix(std::initializer_list<T> ilist)
-      : container_(ilist),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+  Matrix(std::initializer_list<T> ilist) : container_(ilist) {
+    resize_<std::is_default_constructible_v<T>>();
+  }
 
-  Matrix(T *begin, T *end)
-      : container_(begin, end),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+  Matrix(T *begin, T *end) : container_(begin, end) {
+    resize_<std::is_default_constructible_v<T>>();
+  }
 
   template <typename InputIt>
-  Matrix(InputIt begin, InputIt end)
-      : container_(begin, end),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+  Matrix(InputIt begin, InputIt end) : container_(begin, end) {
+    resize_<std::is_default_constructible_v<T>>();
+  }
 
-  Matrix(const std::vector<T> &other)
-      : container_(other),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+  Matrix(const std::vector<T> &container) : container_(container) {
+    resize_<std::is_default_constructible_v<T>>();
+  }
 
   size_t size() const { return sz_; }
 
@@ -54,7 +60,17 @@ class Matrix final {
 
   size_t columns() const { return Columns; }
 
-  T det() const { return determinant<Rows == Columns>(); }
+  iterator begin() { return container_.begin(); }
+
+  const_iterator begin() const { return container_.cbegin(); }
+
+  const_iterator cbegin() const { return container_.cbegin(); }
+
+  iterator end() { return container_.end(); }
+
+  const_iterator end() const { return container_.cend(); }
+
+  const_iterator cend() const { return container_.cend(); }
 
   T &operator()(size_t row, size_t column) {
     return container_[column + (row * Columns)];
@@ -65,17 +81,19 @@ class Matrix final {
   }
 
   T &at(size_t row, size_t column) {
-    if (row >= Rows || column >= Columns) {
+    size_t index = column + (row * Columns);
+    if (index >= sz_ || row >= Rows || column >= Columns) {
       throw std::out_of_range("Invalid index");
     }
-    return container_[column + (row * Columns)];
+    return container_[index];
   }
 
   const T &at(size_t row, size_t column) const {
-    if (row >= Rows || column >= Columns) {
+    size_t index = column + (row * Columns);
+    if (index >= sz_ || row >= Rows || column >= Columns) {
       throw std::out_of_range("Invalid index");
     }
-    return container_[column + (row * Columns)];
+    return container_[index];
   }
 
   Matrix<Rows, Columns, T> &operator+=(const Matrix<Rows, Columns, T> &matrix) {
@@ -94,30 +112,12 @@ class Matrix final {
 
   template <typename U>
   Matrix<Rows, Columns, T> &operator*=(const U &value) {
-    for (auto &val : container_) {
+    for (auto&& val : container_) {
       val *= value;
     }
     return *this;
   }
 };
-
-template <size_t Rows, size_t Columns, typename T>
-bool operator==(Matrix<Rows, Columns, T> &left,
-                Matrix<Rows, Columns, T> &right) {
-  if (left.size() != right.size()) {
-    return false;
-  }
-
-  for (size_t row = 0; row < Rows; ++row) {
-    for (size_t column = 0; column < Columns; ++column) {
-      if (left(row, column) != right(row, column)) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
 
 template <size_t Rows, size_t Columns, typename T, typename U>
 Matrix<Rows, Columns, T> operator*(const Matrix<Rows, Columns, T> &matrix,
