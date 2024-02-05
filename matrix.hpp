@@ -10,8 +10,8 @@ template <size_t Rows, size_t Columns, typename T>
 class Matrix final {
  private:
   size_t cap_ = Rows * Columns;
-  size_t sz_ = 0;
   std::vector<T> container_;
+  size_t sz_ = 0;
 
   using iterator = typename std::vector<T>::iterator;
   using const_iterator = typename std::vector<T>::const_iterator;
@@ -52,12 +52,20 @@ class Matrix final {
 
   const_iterator cbegin() const { return container_.cbegin(); }
 
-  // rewrite ends
-  iterator end() { return container_.end(); }
+  iterator end() {
+    return container_.size() <= cap_ ? container_.end()
+                                     : container_.begin() + cap_;
+  }
 
-  const_iterator end() const { return container_.cend(); }
+  const_iterator end() const {
+    return container_.size() <= cap_ ? container_.cend()
+                                     : container_.cbegin() + cap_;
+  }
 
-  const_iterator cend() const { return container_.cend(); }
+  const_iterator cend() const {
+    return container_.size() <= cap_ ? container_.cend()
+                                     : container_.cbegin() + cap_;
+  }
 
   T &operator()(size_t row, size_t column) {
     return container_[column + (row * Columns)];
