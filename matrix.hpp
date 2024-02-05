@@ -93,13 +93,9 @@ class Matrix final {
     return container_[index];
   }
 
-  void assign(const T& value) {
-    container_.assign(cap_, value);
-  }
+  void assign(const T& value) { container_.assign(cap_, value); }
 
-  void assign(std::initializer_list<T> ilist) {
-    container_.assign(ilist);
-  }
+  void assign(std::initializer_list<T> ilist) { container_.assign(ilist); }
 
   void assign(std::vector<T>& other) {
     contaier_.assign(other.begin(), other.end());
@@ -126,7 +122,7 @@ class Matrix final {
 
   template <typename U>
   Matrix<Rows, Columns, T> &operator*=(const U &value) {
-    for (auto &&val : container_) { val *= value; }
+    for (auto&& val : container_) { val *= value; }
     return *this;
   }
 };
@@ -182,7 +178,7 @@ Matrix<Rows, Columns, T> operator-(const Matrix<Rows, Columns, T> &left,
 }
 
 template <size_t Rows, size_t Columns, typename T>
-Matrix<Rows, Columns, T> operator+(Matrix<Rows, Columns, T>& matrix) {
+Matrix<Rows, Columns, T> operator+(Matrix<Rows, Columns, T> &matrix) {
   auto copy = matrix;
   return copy;
 }
