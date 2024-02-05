@@ -1,3 +1,3 @@
 # Matrix Class
 
-Wrapper over std::vector and math over matrices.
+Wrapper-matrix over std::vector and math on matrices.
