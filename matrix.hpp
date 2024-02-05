@@ -93,6 +93,23 @@ class Matrix final {
     return container_[index];
   }
 
+  void assign(const T& value) {
+    container_.assign(cap_, value);
+  }
+
+  void assign(std::initializer_list<T> ilist) {
+    container_.assign(ilist);
+  }
+
+  void assign(std::vector<T>& other) {
+    contaier_.assign(other.begin(), other.end());
+  }
+
+  template <typename InputIt>
+  void assign(InputIt begin, InputIt end) {
+    container_.assign(begin, end);
+  }
+
   Matrix<Rows, Columns, T> &operator+=(const Matrix<Rows, Columns, T> &matrix) {
     for (size_t ind = 0; ind < sz_; ++ind) {
       container_[ind] += matrix.container_[ind];
