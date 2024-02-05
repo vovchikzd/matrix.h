@@ -22,21 +22,21 @@ class Matrix final {
   Matrix(const T &value) : container_(cap_, value), sz_(cap_) {}
 
   Matrix(std::initializer_list<T> ilist)
-      : container_(ilist),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(ilist)
+      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   Matrix(T *begin, T *end)
-      : container_(begin, end),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(begin, end)
+      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   template <typename InputIt>
   Matrix(InputIt begin, InputIt end)
-      : container_(begin, end),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(begin, end)
+      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   Matrix(const std::vector<T> &container)
-      : container_(container),
-        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(container)
+      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   size_t size() const { return sz_; }
 
@@ -45,6 +45,8 @@ class Matrix final {
   size_t rows() const { return Rows; }
 
   size_t columns() const { return Columns; }
+
+  bool empty() const { return sz_ == 0; }
 
   iterator begin() { return container_.begin(); }
 
@@ -107,9 +109,7 @@ class Matrix final {
 
   template <typename U>
   Matrix<Rows, Columns, T> &operator*=(const U &value) {
-    for (auto &&val : container_) {
-      val *= value;
-    }
+    for (auto &&val : container_) { val *= value; }
     return *this;
   }
 };
@@ -165,8 +165,9 @@ Matrix<Rows, Columns, T> operator-(const Matrix<Rows, Columns, T> &left,
 }
 
 template <size_t Rows, size_t Columns, typename T>
-Matrix<Rows, Columns, T> operator+(Matrix<Rows, Columns, T> matrix) {
-  return matrix;
+Matrix<Rows, Columns, T> operator+(Matrix<Rows, Columns, T>& matrix) {
+  auto copy = matrix;
+  return copy;
 }
 
 template <size_t Rows, size_t Columns, typename T>
