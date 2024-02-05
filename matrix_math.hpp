@@ -25,7 +25,7 @@ template <size_t Rows, size_t Columns, typename T>
 Matrix<Columns, Rows, T> transpose(const Matrix<Rows, Columns, T>& matrix) {
   std::vector<T> pre_result;
   pre_result.reserve(Rows * Columns);
-  for (size_t column = 0;  column < Columns; ++columns) {
+  for (size_t column = 0; column < Columns; ++columns) {
     for (size_t row = 0; row < Rows; ++rows) {
       pre_result.push_back(matrix(row, column));
     }

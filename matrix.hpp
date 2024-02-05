@@ -22,21 +22,21 @@ class Matrix final {
   Matrix(const T &value) : container_(cap_, value), sz_(cap_) {}
 
   Matrix(std::initializer_list<T> ilist)
-      : container_(ilist)
-      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(ilist),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   Matrix(T *begin, T *end)
-      : container_(begin, end)
-      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(begin, end),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   template <typename InputIt>
   Matrix(InputIt begin, InputIt end)
-      : container_(begin, end)
-      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(begin, end),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   Matrix(const std::vector<T> &container)
-      : container_(container)
-      , sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
+      : container_(container),
+        sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
   size_t size() const { return sz_; }
 
@@ -93,17 +93,25 @@ class Matrix final {
     return container_[index];
   }
 
-  void assign(const T& value) { container_.assign(cap_, value); }
+  void assign(const T &value) {
+    container_.assign(cap_, value);
+    sz_ = cap_;
+  }
 
-  void assign(std::initializer_list<T> ilist) { container_.assign(ilist); }
+  void assign(std::initializer_list<T> ilist) {
+    container_.assign(ilist);
+    sz_ = container_.size() >= cap_ ? cap_ : container_.size();
+  }
 
-  void assign(std::vector<T>& other) {
-    contaier_.assign(other.begin(), other.end());
+  void assign(std::vector<T> &other) {
+    container_.assign(other.begin(), other.end());
+    sz_ = container_.size() >= cap_ ? cap_ : container_.size();
   }
 
   template <typename InputIt>
   void assign(InputIt begin, InputIt end) {
     container_.assign(begin, end);
+    sz_ = container_.size() >= cap_ ? cap_ : container_.size();
   }
 
   Matrix<Rows, Columns, T> &operator+=(const Matrix<Rows, Columns, T> &matrix) {
@@ -122,7 +130,9 @@ class Matrix final {
 
   template <typename U>
   Matrix<Rows, Columns, T> &operator*=(const U &value) {
-    for (auto&& val : container_) { val *= value; }
+    for (auto &&val : container_) {
+      val *= value;
+    }
     return *this;
   }
 };
