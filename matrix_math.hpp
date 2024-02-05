@@ -37,4 +37,14 @@ Matrix<Columns, Rows, T> transpose(const Matrix<Rows, Columns, T>& matrix) {
 template <size_t K, typename T>
 T determinant(const Matrix<K, K, T>& matrix) {}
 
+template <size_t K, typename T>
+Matrix<K, K, T> invertible(const Matrix<K, K, T>& matrix) {}
+
+template <size_t Rows, size_t Columns, typename T>
+void mult_row(Matrix<Rows, Columns, T>& matrix, size_t row, T& value)  {}
+
+template <size_t Rows, size_t Columns, typename T>
+void mult_column(Matrix<Rows, Columns, T>& matrix, size_t column, T& value)  {}
+
+
 #endif
