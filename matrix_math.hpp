@@ -35,16 +35,37 @@ Matrix<Columns, Rows, T> transpose(const Matrix<Rows, Columns, T>& matrix) {
 }
 
 template <size_t K, typename T>
-T determinant(const Matrix<K, K, T>& matrix) {}
+T determinant(Matrix<K, K, T> matrix) {}
 
 template <size_t K, typename T>
-Matrix<K, K, T> invertible(const Matrix<K, K, T>& matrix) {}
+Matrix<K, K, T> invertible(Matrix<K, K, T> matrix) {}
 
 template <size_t Rows, size_t Columns, typename T>
-void mult_row(Matrix<Rows, Columns, T>& matrix, size_t row, T& value)  {}
+void mult_row(Matrix<Rows, Columns, T>& matrix, size_t row, T& value)  {
+  for (size_t column = 0; column < Columns; ++column) {
+    matrix(row, column) *= value;
+  }
+}
 
 template <size_t Rows, size_t Columns, typename T>
-void mult_column(Matrix<Rows, Columns, T>& matrix, size_t column, T& value)  {}
+void mult_column(Matrix<Rows, Columns, T>& matrix, size_t column, T& value)  {
+  for (size_t row = 0; row < Rows; ++row) {
+    matrix(row, column) *= value;
+  }
+}
 
+template <size_t Rows, size_t Columns, typename T>
+void add_rows(Matrix<Rows, Columns, T>& matrix, size_t src, size_t target) {
+  for (size_t column = 0; column < Columns; ++column) {
+    matrix(target, column) += matrix(src, column);
+  }
+}
+
+template <size_t Rows, size_t Columns, typename T>
+void add_columns(Matrix<Rows, Columns, T>& matrix, size_t src, size_t target) {
+  for (size_t row = 0; row < Rows; ++row) {
+    matrix(row, target) += matrix(row, src);
+  }
+} 
 
 #endif
