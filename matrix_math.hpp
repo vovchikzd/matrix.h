@@ -34,12 +34,6 @@ Matrix<Columns, Rows, T> transpose(const Matrix<Rows, Columns, T>& matrix) {
   return result;
 }
 
-template <size_t K, typename T>
-T determinant(Matrix<K, K, T> matrix) {}
-
-template <size_t K, typename T>
-Matrix<K, K, T> invertible(Matrix<K, K, T> matrix) {}
-
 template <size_t Rows, size_t Columns, typename T>
 void mult_row(Matrix<Rows, Columns, T>& matrix, size_t row, T& value)  {
   for (size_t column = 0; column < Columns; ++column) {
@@ -67,5 +61,23 @@ void add_columns(Matrix<Rows, Columns, T>& matrix, size_t src, size_t target) {
     matrix(row, target) += matrix(row, src);
   }
 } 
+
+template<size_t K, typename T>
+Matrix<K, K, T> powm(Matrix<K, K, T> base, size_t pow, Matrix<K, K, T> acc) {
+  if (pow == 1) return base;
+  while (pow > 0) {
+    if ((pow & 1) == 0x1) { acc = acc * base; --pow; }
+    else { base = base * base; pow /= 2; }
+  }
+  return acc;
+}
+
+#if 0
+template <size_t K, typename T>
+T determinant(Matrix<K, K, T> matrix) {}
+
+template <size_t K, typename T>
+Matrix<K, K, T> invertible(Matrix<K, K, T> matrix) {}
+#endif
 
 #endif
