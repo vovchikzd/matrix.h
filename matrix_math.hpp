@@ -73,6 +73,26 @@ Matrix<K, K, T> powm(Matrix<K, K, T> base, size_t pow, Matrix<K, K, T> acc) {
 }
 
 #if 0
+
+template <size_t K, typename T>
+Matrix<K, K, T> get_diagonal(const Matrix<K, K, T>&, const T& value = 1
+                                                          , const T& zero = 0) {
+  Matrix<K, K, T> result(zero);
+  for (size_t index = 0; index < K; ++index) {
+    result(index, index) = value;
+  }
+  return result;
+}
+
+template <size_t K, typename T>
+Matrix<K, K, T> get_diagonal(const T& value = 1, const T& zero = 0) {
+  Matrix<K, K, T> result(zero);
+  for (size_t index = 0; index < K; ++index) {
+    result(index, index) = value;
+  }
+  return result;
+}
+
 template <size_t K, typename T>
 T determinant(Matrix<K, K, T> matrix) {}
 
