@@ -38,6 +38,8 @@ class Matrix final {
       : container_(container),
         sz_(container_.size() >= cap_ ? cap_ : container_.size()) {}
 
+// Iterators per row and per column? How?
+#if 0
   size_t size() const { return sz_; }
 
   size_t capacity() const { return cap_; }
@@ -68,6 +70,7 @@ class Matrix final {
     return container_.size() <= cap_ ? container_.cend()
                                      : container_.cbegin() + cap_;
   }
+#endif
 
   T &operator()(size_t row, size_t column) {
     return container_[column + (row * Columns)];
