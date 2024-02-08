@@ -188,9 +188,8 @@ Matrix<Rows, Columns, T> operator-(const Matrix<Rows, Columns, T> &left,
 }
 
 template <size_t Rows, size_t Columns, typename T>
-Matrix<Rows, Columns, T> operator+(Matrix<Rows, Columns, T> &matrix) {
-  auto copy = matrix;
-  return copy;
+Matrix<Rows, Columns, T> operator+(Matrix<Rows, Columns, T> matrix) {
+  return matrix;
 }
 
 template <size_t Rows, size_t Columns, typename T>
